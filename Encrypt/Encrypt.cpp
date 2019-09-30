@@ -28,6 +28,10 @@ public:
 		case 1:
 			Playfair(Plaintext, key);
 			break;
+		case 2:
+			Vernam(Plaintext, key);
+			break;
+
 		default:
 			cout << "Wrong Input !" << endl;
 			break;
@@ -44,17 +48,25 @@ private:
 		{
 			shiftAmount += (key[i] - '0') * pow(10, (key.length() - i - 1));
 		}
+#ifdef DEBUG
+		cout << shiftAmount << endl;
+#endif // DEBUG
+
 		shiftAmount = shiftAmount % 26;
 		for (int i = 0; i < plaintext.length(); ++i)
 		{
-			plaintext[i] += shiftAmount;
-			if (plaintext[i] > 'z')
+			if ((plaintext[i] + shiftAmount) > 'z')
 			{
-				plaintext[i] = 'a' + (plaintext[i] - 'z') - 1;
+				plaintext[i] = 'a' + ((plaintext[i] + shiftAmount) - 'z' - 1);
+			}
+			else
+			{
+				plaintext[i] += shiftAmount;
 			}
 			plaintext[i] = toupper(plaintext[i]);
+			cout << plaintext[i];
 		}
-		cout << plaintext << endl;
+		cout << endl;
 	}
 	// Playfair
 	void Playfair(string &plaintext, string key)
@@ -237,8 +249,13 @@ private:
 		}
 		cout << endl;
 	}
+	// Vernam
+	void Vernam(string &plaintext, string key)
+	{
+		for (int i = 0; i < plaintext.length(); ++i)
+			plaintext[i] = toupper(plaintext[i]);
+	}
 };
-//#define DEBUG
 int main(int argc, char **argv)
 {
 #ifdef DEBUG
