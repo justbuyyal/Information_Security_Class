@@ -245,23 +245,37 @@ private:
 			{
 				cout << Map[row[k]][col[k]];
 			}
-			cout << " " << endl;
 		}
 		cout << endl;
 	}
 	// Vernam
 	void Vernam(string &plaintext, string key)
 	{
+		int keyLength = key.length();
+#ifdef DEBUG
+		cout << "key : " << keyLength << endl;
+#endif // DEBUG
 		for (int i = 0; i < plaintext.length(); ++i)
+		{
 			plaintext[i] = toupper(plaintext[i]);
+		}
+		// Build New Key
+		key += plaintext;
+		key.erase(key.end() - keyLength, key.end());
+#ifdef DEBUG
+		cout << key << endl;
+#endif // DEBUG
+
+		for (int i = 0; i < plaintext.length(); ++i)
+		{
+			plaintext[i] = ((plaintext[i] - 'A') ^ (key[i] - 'A')) + 'A';
+			cout << plaintext[i];
+		}
+		cout << endl;
 	}
 };
 int main(int argc, char **argv)
 {
-#ifdef DEBUG
-	cout << argc << endl;
-#endif // DEBUG
-
 	if (argc < 4)
 	{
 #ifdef DEBUG
