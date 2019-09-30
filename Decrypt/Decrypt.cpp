@@ -3,7 +3,9 @@
 #include <string>
 #include <vector>
 using namespace std;
-#define DEBUG
+//#define DEBUG
+//#define CIN
+
 class Decrypt
 {
 public:
@@ -11,7 +13,6 @@ public:
 	string Ciphertext;
 	int flag = -1;
 	Decrypt(string cipher, string key, string Ciphertext) {
-		Ciphertext = Ciphertext;
 		for (int i = 0; i < 5; ++i)
 		{
 			if (cipher.compare(Ciphers[i]) == 0)
@@ -26,7 +27,7 @@ public:
 			Caesar(Ciphertext, key);
 			break;
 		case 1:
-			//Playfair(Ciphertext, key);
+			Playfair(Ciphertext, key);
 			break;
 		default:
 			cout << "Wrong Input !" << endl;
@@ -34,6 +35,7 @@ public:
 		}
 	}
 private:
+
 	// Caesar
 	void Caesar(string &Ciphertext, string key) {
 #ifdef DEBUG
@@ -53,43 +55,22 @@ private:
 		}
 		cout << Ciphertext << endl;
 	}
+
 	// Playfair
-    /*
 	void Playfair(string &Ciphertext, string key)
 	{
 		vector<string>Decrypt;
 		char Map[5][5] = { 0 };
-		for (int i = 0; i < Ciphertext.length(); ++i)
+		
+		//let ciphertext in pairs
+		for (int i = 0; i < Ciphertext.length(); i += 2)
 		{
 			string temp = "";
-			temp += toupper(Ciphertext[i]);
-			if (i != Ciphertext.length() - 1)
-			{
-				if (Ciphertext[i + 1] != Ciphertext[i])
-				{
-					temp += toupper(Ciphertext[i + 1]);
-					Decrypt.push_back(temp);
-					++i;
-				}
-				else
-				{
-					if (Ciphertext[i] == 'X')
-						temp += 'Q';
-					else
-						temp += 'X';
-					Decrypt.push_back(temp);
-					continue;
-				}
-			}
-			else
-			{
-				if (Ciphertext[i] == 'X')
-					temp += 'Q';
-				else
-					temp += 'X';
-				Decrypt.push_back(temp);
-			}
+			temp += Ciphertext[i];
+			temp += Ciphertext[i+1];
+			Decrypt.push_back(temp);
 		}
+
 #ifdef DEBUG
 		for (int i = 0; i < Decrypt.size(); ++i)
 		{
@@ -100,6 +81,8 @@ private:
 #ifdef DEBUG
 		cout << "Playfair" << endl;
 #endif // DEBUG
+
+		//create key map
 		for (int i = 0; i < key.length(); ++i)
 		{
 			bool temp = false;
@@ -151,6 +134,7 @@ private:
 				}
 			}
 		}
+
 #ifdef DEBUG
 		for (int i = 0; i < 5; ++i)
 		{
@@ -161,6 +145,7 @@ private:
 			cout << endl;
 		}
 #endif // DEBUG
+		string plaintext = "";
 		for (int i = 0; i < Decrypt.size(); ++i)
 		{
 			int row[2],col[2];
@@ -198,10 +183,10 @@ private:
 #endif // DEBUG
 				for (int j = 0; j < 2; ++j)
 				{
-					if (col[j] == 4)
-						col[j] = 0;
+					if (col[j] == 0)
+						col[j] = 4;
 					else
-						++col[j];
+						--col[j];
 				}
 			}
 			// same col
@@ -213,10 +198,10 @@ private:
 
 				for (int j = 0; j < 2; ++j)
 				{
-					if (row[j] == 4)
-						row[j] = 0;
+					if (row[j] == 0)
+						row[j] = 4;
 					else
-						++row[j];
+						--row[j];
 				}
 			}
 			// other
@@ -227,22 +212,34 @@ private:
 #endif // DEBUG
 				swap(col[0], col[1]);
 			}
+			
+			//erase space in plaintext
 			for (int k = 0; k < 2; ++k)
 			{
-				cout << Map[row[k]][col[k]];
+				plaintext += tolower(Map[row[k]][col[k]]);
 			}
-			cout << " " << endl;
 		}
-		cout << endl;
-	}*/
+
+		// erase 'x' in plaintext we fill in before
+		for (int i = 0; i < plaintext.length(); ++i)
+		{
+			if (plaintext[i] == 'x' && plaintext[i - 1] == plaintext[i + 1])
+			{
+				plaintext.erase(i, 1);
+			}
+		}
+		cout << plaintext;
+	}
 };
-//#define DEBUG
+
+
 int main(int argc, char **argv)
 {
 #ifdef DEBUG
 	cout << argc << endl;
 #endif // DEBUG
 
+#ifndef CIN
 	if (argc < 4)
 	{
 #ifdef DEBUG
@@ -252,10 +249,20 @@ int main(int argc, char **argv)
 	}
 	else
 	{
+		
 		string cipher(argv[1]);
 		string key(argv[2]);
 		string Ciphertext(argv[3]);
-		Decrypt Decrypt(cipher, key, Ciphertext);
+#endif // !CIN
+
+#ifdef CIN
+	{
+		string cipher,key,Ciphertext;
+		while(cin >> cipher >> key >>  Ciphertext)
+#endif // CIN
+
+			Decrypt Decrypt(cipher, key, Ciphertext);
+		
 		return 0;
 	}
 }
