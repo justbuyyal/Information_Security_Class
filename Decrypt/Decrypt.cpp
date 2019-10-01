@@ -29,6 +29,13 @@ public:
 		case 1:
 			Playfair(Ciphertext, key);
 			break;
+		case 2:
+			Vernam(Ciphertext, key);
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
 		default:
 			cout << "Wrong Input !" << endl;
 			break;
@@ -228,6 +235,22 @@ private:
 				plaintext.erase(i, 1);
 			}
 		}
+		cout << plaintext;
+	}
+
+	//vernam
+	void Vernam(string& Ciphertext, string key)
+	{
+		string plaintext = "";
+			   
+		for (int i = 0; i < Ciphertext.length(); ++i)
+		{
+			if (i < key.length())
+				plaintext += tolower(((Ciphertext[i] - 'A') ^ (key[i] - 'A')) + 'A');
+			else
+				plaintext += tolower(((Ciphertext[i] - 'A') ^ (plaintext[i - key.length()] - 'A')) + 'A');
+		}
+		
 		cout << plaintext;
 	}
 };
