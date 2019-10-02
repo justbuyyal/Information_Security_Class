@@ -322,6 +322,97 @@ private:
 	//rail_fence
 	void Rail_fence(string& Ciphertext, string key)
 	{
+		int rows = stoi(key);
+		// To lower
+		for (int i = 0; i < Ciphertext.length(); ++i)
+			Ciphertext[i] = tolower(Ciphertext[i]);
+
+		vector<vector<char>> Fence;
+		Fence.resize(rows);
+		for (int i = 0; i < rows; i++)
+		{
+			Fence[i].resize(Ciphertext.length());
+		}
+
+		// Decrypting
+		int positionx, positiony, count;
+		bool flag = false;
+		positionx = positiony = count = 0;
+		int space = 2 * (rows - 1);
+		int length = Ciphertext.length();
+		int flagP = 0;
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int p = 0, c = 0, positiony = i; positiony < length && p < length; c++)
+			{
+				if (Ciphertext[p] == '_')
+				{
+					p++;
+					continue;
+				}
+				Fence[i][positiony] = Ciphertext[p];
+
+				if (c == 1)
+					flagP = positiony;
+
+				positiony += space;
+				Ciphertext[p] = '_';
+
+				if (i == 0 || i == rows - 1)
+					p++;
+				else
+					p += 2;
+			}
+
+			for (int p = 0, positiony = flagP; positiony < length && i != 0 && p <length;)
+			{
+				if (Ciphertext[p] == '_')
+				{
+					p++;
+					continue;
+				}
+				Fence[i][positiony] = Ciphertext[p];
+				positiony += space;
+				Ciphertext[p] = '_';
+			}
+			flagP--;
+		}
+
+		string plaintext = "";
+		while (count < Ciphertext.length())
+		{
+			plaintext += Fence[positionx][positiony];
+			++count;
+			// Up to Down
+			if (!flag)
+			{
+				if (positionx == (rows - 1))
+				{
+					flag = true;
+					--positionx;
+					++positiony;
+					continue;
+				}
+				++positionx;
+				++positiony;
+			}
+			// Down to Up
+			else
+			{
+				if (positionx == 0)
+				{
+					flag = false;
+					++positionx;
+					++positiony;
+					continue;
+				}
+				--positionx;
+				++positiony;
+			}
+			
+		}
+		cout << plaintext;
 	}
 };
 
