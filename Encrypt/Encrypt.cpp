@@ -31,7 +31,11 @@ public:
 		case 2:
 			Vernam(Plaintext, key);
 			break;
-
+		case 3:
+			break;
+		case 4:
+			Rail_Fence(Plaintext, key);
+			break;
 		default:
 			cout << "Wrong Input !" << endl;
 			break;
@@ -270,6 +274,79 @@ private:
 		{
 			plaintext[i] = ((plaintext[i] - 'A') ^ (key[i] - 'A')) + 'A';
 			cout << plaintext[i];
+		}
+		cout << endl;
+	}
+	// Rail_Fence
+	void Rail_Fence(string &plaintext, string key)
+	{
+		int rows = 0;
+		for (int i = key.length() - 1; i >= 0; --i)
+		{
+			rows += (key[i] - '0') * pow(10, (key.length() - i - 1));
+		}
+		// To upper
+		for (int i = 0; i < plaintext.length(); ++i)
+			plaintext[i] = toupper(plaintext[i]);
+		// Build Dynamic rows
+		char** Fence = new char*[rows];
+		for (int i = 0; i < rows; ++i)
+		{
+			Fence[i] = new char[plaintext.length()];
+		}
+		// Array initial
+		for (int i = 0; i < rows; ++i)
+		{
+			for (int j = 0; j < plaintext.length(); ++j)
+			{
+				Fence[i][j] = 0;
+			}
+		}
+		// Encrypting
+		int positionx, positiony, count;
+		bool flag = false;
+		positionx = positiony = count = 0;
+		while (count <= plaintext.length())
+		{
+			Fence[positionx][positiony] = plaintext[count];
+			// Up to Down
+			if (!flag)
+			{
+				if (positionx == (rows - 1))
+				{
+					flag = true;
+					continue;
+				}
+				++positionx;
+				++positiony;
+			}
+			// Down to Up
+			else
+			{
+				if (positionx == 0)
+				{
+					flag = false;
+					continue;
+				}
+				--positionx;
+				++positiony;
+			}
+			++count;
+		}
+		// Output
+		for (int i = 0; i < rows; ++i)
+		{
+			for (int j = 0; j < plaintext.length(); ++j)
+			{
+				if (Fence[i][j])
+				{
+					cout << Fence[i][j];
+				}
+				else
+				{
+					continue;
+				}
+			}
 		}
 		cout << endl;
 	}
