@@ -31,7 +31,12 @@ public:
 		case 2:
 			Vernam(Plaintext, key);
 			break;
-
+		case 3:
+			Row_Transposition(Plaintext, key);
+			break;
+		case 4:
+			Rail_Fence(Plaintext, key);
+			break;
 		default:
 			cout << "Wrong Input !" << endl;
 			break;
@@ -72,6 +77,7 @@ private:
 	void Playfair(string &plaintext, string key)
 	{
 		vector<string>Encrypt;
+		Encrypt.clear();
 		char Map[5][5] = { 0 };
 		for (int i = 0; i < plaintext.length(); ++i)
 		{
@@ -270,6 +276,127 @@ private:
 		{
 			plaintext[i] = ((plaintext[i] - 'A') ^ (key[i] - 'A')) + 'A';
 			cout << plaintext[i];
+		}
+		cout << endl;
+	}
+	// Row
+	void Row_Transposition(string &plaintext, string key)
+	{
+		vector<int>position;
+		position.clear();
+		int row = plaintext.length() / key.length();
+		if (plaintext.length() % key.length())
+		{
+			++row;
+		}
+		// To upper
+		for (int i = 0; i < plaintext.length(); ++i)
+			plaintext[i] = toupper(plaintext[i]);
+		// Build Dynamic array
+		char** Map = new char*[row];
+		for (int i = 0; i < row; ++i)
+		{
+			Map[i] = new char[key.length()];
+		}
+		// Array initial
+		for (int i = 0; i < row; ++i)
+		{
+			for (int j = 0; j < key.length(); ++j)
+			{
+				Map[i][j] = 0;
+			}
+		}
+		// Make Order
+		for (int i = 0; i < key.length(); ++i)
+		{
+			position.push_back((key[i] - '0' - 1));
+		}
+		// Insert to Map
+		for (int i = 0; i < plaintext.length(); ++i)
+		{
+			Map[i / position.size()][position[i % position.size()]] = plaintext[i];
+		}
+		// Output
+		for (int i = 0; i < position.size(); ++i)
+		{
+			for (int j = 0; j < row; ++j)
+			{
+				if(Map[j][i])
+					cout << Map[j][i];
+			}
+		}
+		cout << endl;
+	}
+	// Rail_Fence
+	void Rail_Fence(string &plaintext, string key)
+	{
+		int rows = 0;
+		for (int i = key.length() - 1; i >= 0; --i)
+		{
+			rows += (key[i] - '0') * pow(10, (key.length() - i - 1));
+		}
+		// To upper
+		for (int i = 0; i < plaintext.length(); ++i)
+			plaintext[i] = toupper(plaintext[i]);
+		// Build Dynamic rows
+		char** Fence = new char*[rows];
+		for (int i = 0; i < rows; ++i)
+		{
+			Fence[i] = new char[plaintext.length()];
+		}
+		// Array initial
+		for (int i = 0; i < rows; ++i)
+		{
+			for (int j = 0; j < plaintext.length(); ++j)
+			{
+				Fence[i][j] = 0;
+			}
+		}
+		// Encrypting
+		int positionx, positiony, count;
+		bool flag = false;
+		positionx = positiony = count = 0;
+		while (count <= plaintext.length())
+		{
+			Fence[positionx][positiony] = plaintext[count];
+			// Up to Down
+			if (!flag)
+			{
+				if (positionx == (rows - 1))
+				{
+					flag = true;
+					continue;
+				}
+				++positionx;
+				++positiony;
+			}
+			// Down to Up
+			else
+			{
+				if (positionx == 0)
+				{
+					flag = false;
+					continue;
+				}
+				--positionx;
+				++positiony;
+			}
+			++count;
+		}
+		// Output
+		for (int i = 0; i < rows; ++i)
+		{
+			for (int j = 0; j < plaintext.length(); ++j)
+			{
+				if (Fence[i][j])
+				{
+					cout << Fence[i][j];
+				}
+				else
+				{
+					continue;
+				}
+			}
 		}
 		cout << endl;
 	}
