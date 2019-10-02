@@ -4,7 +4,6 @@
 #include <vector>
 using namespace std;
 //#define DEBUG
-//#define CIN
 
 class Decrypt
 {
@@ -33,8 +32,10 @@ public:
 			Vernam(Ciphertext, key);
 			break;
 		case 3:
+			Row(Ciphertext, key);
 			break;
 		case 4:
+			Rail_fence(Ciphertext, key);
 			break;
 		default:
 			cout << "Wrong Input !" << endl;
@@ -252,6 +253,75 @@ private:
 		}
 		
 		cout << plaintext;
+	}
+
+	//row
+	void Row(string & Ciphertext, string key)
+	{
+		//create empty plaintext table
+		vector<vector<char>> pTextTable;
+		int col = key.length();
+		int row = ceil(double(Ciphertext.length()) / double(col));
+		pTextTable.resize(row);
+		for (int i = 0; i < row; ++i)
+		{
+			pTextTable[i].resize(col);
+		}
+
+		//decrypt
+		int flagP = col + '0';	//position flag check key[i]
+		for (int i = 0; i < key.length(); i++)
+		{
+			//point to ciphertext position
+			int p = key[i] - '0' - 1;
+			//plaintext is rectangle
+			if (Ciphertext.length() % col == 0)
+			{
+				p *= row;
+			}
+			//plaintext isn't rectangle
+			else
+			{
+				int flag = Ciphertext.length() % col;
+				p *= (row - 1);
+				
+				if (i < flag)
+				{
+					flagP = key[i];	//record the column num of the extra latter
+					pTextTable[row - 1][i] = tolower(Ciphertext[p + row - 1]);	//fill in extra latter first
+				}
+				else if (key[i] > flagP)
+				{
+					p += flag;
+				}
+			}
+
+			//fill in the part of rectangle
+			for (int j = 0; j < row; ++j, ++p)
+			{
+				pTextTable[j][i] = tolower(Ciphertext[p]);
+				if (Ciphertext.length() % col != 0 && j == row - 2)
+					break;
+			}
+		}
+
+		//output
+		string plaintext = "";
+		for (int i = 0; i < row;++i)
+		{
+			for (int j = 0; j < col && pTextTable[i][j] != 0; ++j)
+			{
+				plaintext += pTextTable[i][j];
+			}
+			pTextTable[i].clear();
+		}
+		cout << plaintext;
+		pTextTable.clear();
+	}
+
+	//rail_fence
+	void Rail_fence(string& Ciphertext, string key)
+	{
 	}
 };
 
