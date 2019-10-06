@@ -3,18 +3,18 @@
 #include <string>
 #include <vector>
 using namespace std;
-//#define DEBUG
+
 class Encrypt
 {
 public:
 	string Ciphers[5] = { "caesar", "playfair", "vernam", "row", "rail_fence" };
 	string Plaintext;
-	int flag = -1;
+	int flag = -1; // 判斷資料正確性用
 	Encrypt(string cipher, string key, string plaintext) {
 		Plaintext = plaintext;
 		for (int i = 0; i < 5; ++i)
 		{
-			if (cipher.compare(Ciphers[i]) == 0)
+			if (cipher.compare(Ciphers[i]) == 0) // 找到加密
 			{
 				flag = i;
 				break;
@@ -49,6 +49,7 @@ private:
 		cout << "Caesar" << endl;
 #endif // DEBUG
 		int shiftAmount = 0;
+		// 計算位移量
 		for (int i = key.length() - 1; i >= 0; --i)
 		{
 			shiftAmount += (key[i] - '0') * pow(10, (key.length() - i - 1));
@@ -56,10 +57,11 @@ private:
 #ifdef DEBUG
 		cout << shiftAmount << endl;
 #endif // DEBUG
-
+		// 取得真正位移量
 		shiftAmount = shiftAmount % 26;
 		for (int i = 0; i < plaintext.length(); ++i)
 		{
+			// 超出範圍(a~z)
 			if ((plaintext[i] + shiftAmount) > 'z')
 			{
 				plaintext[i] = 'a' + ((plaintext[i] + shiftAmount) - 'z' - 1);
@@ -76,21 +78,24 @@ private:
 	// Playfair
 	void Playfair(string &plaintext, string key)
 	{
-		vector<string>Encrypt;
+		vector<string>Encrypt; // 存放要加密的資料(Two char per group)
 		Encrypt.clear();
 		char Map[5][5] = { 0 };
+		// 分離要加密字元並確認下一個有無重複字元
 		for (int i = 0; i < plaintext.length(); ++i)
 		{
 			string temp = "";
 			temp += toupper(plaintext[i]);
 			if (i != plaintext.length() - 1)
 			{
+				// 無重複
 				if (plaintext[i + 1] != plaintext[i])
 				{
 					temp += toupper(plaintext[i + 1]);
 					Encrypt.push_back(temp);
 					++i;
 				}
+				// 有重複(分別為X and Q)
 				else
 				{
 					if (plaintext[i] == 'X')
@@ -101,6 +106,7 @@ private:
 					continue;
 				}
 			}
+			// 最後一個字元
 			else
 			{
 				if (plaintext[i] == 'X')
@@ -120,6 +126,7 @@ private:
 #ifdef DEBUG
 		cout << "Playfair" << endl;
 #endif // DEBUG
+		// 建表
 		for (int i = 0; i < key.length(); ++i)
 		{
 			bool temp = false;
@@ -127,11 +134,13 @@ private:
 			{
 				for (int k = 0; k < 5; ++k)
 				{
+					// 出現重複字元
 					if(Map[j][k] == key[i])
 					{
 						temp = true;
 						break;
 					}
+					// 未出現
 					else if (Map[j][k] == 0)
 					{
 						Map[j][k] = key[i];
@@ -145,6 +154,7 @@ private:
 				}
 			}
 		}
+		// 填表(A~Z)
 		for (int i = 0; i < 26; ++i)
 		{
 			// Insert into map
@@ -153,6 +163,7 @@ private:
 			{
 				for (int k = 0; k < 5; ++k)
 				{
+					// 出現重複或I或J
 					if (Map[j][k] == ('A' + i) || (('A' + i) == 'I' && Map[j][k] == 'J') || (('A' + i) == 'J') && Map[j][k] == 'I')
 					{
 						temp = true;
@@ -181,9 +192,11 @@ private:
 			cout << endl;
 		}
 #endif // DEBUG
+		// 加密and查表
 		for (int i = 0; i < Encrypt.size(); ++i)
 		{
 			int row[2],col[2];
+			// 紀錄加密資料位置
 			for (int j = 0; j < 2; ++j)
 			{
 				bool temp = false;
@@ -271,7 +284,7 @@ private:
 #ifdef DEBUG
 		cout << key << endl;
 #endif // DEBUG
-
+		// Encrypt
 		for (int i = 0; i < plaintext.length(); ++i)
 		{
 			plaintext[i] = ((plaintext[i] - 'A') ^ (key[i] - 'A')) + 'A';
@@ -282,7 +295,7 @@ private:
 	// Row
 	void Row_Transposition(string &plaintext, string key)
 	{
-		vector<int>position;
+		vector<int>position; // New Order
 		position.clear();
 		int row = plaintext.length() / key.length();
 		if (plaintext.length() % key.length())
@@ -331,6 +344,7 @@ private:
 	void Rail_Fence(string &plaintext, string key)
 	{
 		int rows = 0;
+		// Calculate rows we really need
 		for (int i = key.length() - 1; i >= 0; --i)
 		{
 			rows += (key[i] - '0') * pow(10, (key.length() - i - 1));
@@ -352,7 +366,7 @@ private:
 				Fence[i][j] = 0;
 			}
 		}
-		// Encrypting
+		// Encrypt
 		int positionx, positiony, count;
 		bool flag = false;
 		positionx = positiony = count = 0;
