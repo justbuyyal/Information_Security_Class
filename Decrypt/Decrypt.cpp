@@ -42,6 +42,7 @@ public:
 			break;
 		}
 	}
+
 private:
 
 	// Caesar
@@ -58,6 +59,10 @@ private:
 			if (Ciphertext[i] < 'A')
 			{
 				Ciphertext[i] = 'Z' - (('Z' - Ciphertext[i]) % 26);
+			}
+			else if (Ciphertext[i] > 'Z')
+			{
+				Ciphertext[i] = 'A' + ((Ciphertext[i] - 'A') % 26);
 			}
 			Ciphertext[i] = tolower(Ciphertext[i]);
 		}
