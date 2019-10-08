@@ -255,7 +255,7 @@ private:
 			if (i < key.length())
 				plaintext += tolower(((Ciphertext[i] - 'A') ^ (key[i] - 'A')) + 'A');
 			else
-				plaintext += tolower(((Ciphertext[i] - 'A') ^ (plaintext[i - key.length()] - 'A')) + 'A');
+				plaintext += tolower(((Ciphertext[i] - 'A') ^ (plaintext[i - key.length()] - 'a')) + 'A');
 		}
 		
 		cout << plaintext;
