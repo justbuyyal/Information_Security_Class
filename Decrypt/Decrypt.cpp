@@ -4,6 +4,7 @@
 #include <vector>
 using namespace std;
 //#define DEBUG
+//#define CIN
 
 class Decrypt
 {
@@ -274,39 +275,27 @@ private:
 		}
 
 		//decrypt
-		int flagP = col + '0';	//position flag check key[i]
-		for (int i = 0; i < key.length(); i++)
+		int flag = Ciphertext.length() % col;
+		int stop;
+		for (int i = 1, k = 0; i < key.length() + 1; i++)	//i counting, k ciphertext position
 		{
-			//point to ciphertext position
-			int p = key[i] - '0' - 1;
-			//plaintext is rectangle
-			if (Ciphertext.length() % col == 0)
-			{
-				p *= row;
-			}
+			int p = key.find(i + 48);	//find the col num of the table
 			//plaintext isn't rectangle
-			else
+			if (flag != 0)
 			{
-				int flag = Ciphertext.length() % col;
-				p *= (row - 1);
-				
-				if (i < flag)
-				{
-					flagP = key[i];	//record the column num of the extra latter
-					pTextTable[row - 1][i] = tolower(Ciphertext[p + row - 1]);	//fill in extra latter first
-				}
-				else if (key[i] > flagP)
-				{
-					p += flag;
-				}
+				//check the col is need or not the last row
+				if (p < flag)
+					stop = row;
+				else
+					stop = row - 1;
 			}
+			//plaintext is rectangle
+			else
+				stop = row;
 
-			//fill in the part of rectangle
-			for (int j = 0; j < row; ++j, ++p)
+			for (int j = 0; j < stop; j++, k++)
 			{
-				pTextTable[j][i] = tolower(Ciphertext[p]);
-				if (Ciphertext.length() % col != 0 && j == row - 2)
-					break;
+				pTextTable[j][p] = tolower(Ciphertext[k]);
 			}
 		}
 
