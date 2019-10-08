@@ -52,13 +52,22 @@ private:
 		// 計算位移量
 		for (int i = key.length() - 1; i >= 0; --i)
 		{
-			shiftAmount += (key[i] - '0') * pow(10, (key.length() - i - 1));
+			if (key[i] == '-')
+				shiftAmount *= -1;
+			else
+				shiftAmount += (key[i] - '0') * pow(10, (key.length() - i - 1));
 		}
 #ifdef DEBUG
 		cout << shiftAmount << endl;
 #endif // DEBUG
+
 		// 取得真正位移量
 		shiftAmount = shiftAmount % 26;
+		if (shiftAmount < 0)
+			shiftAmount = abs(shiftAmount + 26);
+#ifdef DEBUG
+		cout << shiftAmount << endl;
+#endif // DEBUG
 		for (int i = 0; i < plaintext.length(); ++i)
 		{
 			// 超出範圍(a~z)
