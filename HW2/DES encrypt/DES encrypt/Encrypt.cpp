@@ -21,10 +21,41 @@ void lRotate(std::bitset<N>& b, unsigned m)
 	b = b << m | b >> (N - m);
 }
 
-
+//f-function
 bitset<32> f_Function(const bitset<32>& Ri_1, const bitset<48>& Ki)
 {
-	bitset<32> fResult;
+	bitset<32> fResult, bTemp;
+	bitset<48> expanR;
+	int iTemp = 0;
+
+	//Expansion
+	for (int i = 0; i < 48; i++)
+	{
+		expanR[i] = Ri_1[E[i] - 1];
+	}
+
+	//XOR with round key
+	expanR ^= Ki;
+
+	//S-box substitution
+	for (int i = 0; i < 6; i++)
+	{
+		for (int j = 47; j >= 0; j -= 6)
+		{
+			int m, n;
+			m = 2 * expanR[j] + expanR[j - 5];
+			n = 8 * expanR[j - 1] + 4 * expanR[j - 2] + 2 * expanR[j - 3] + expanR[j - 4];
+			iTemp += S_Box[i][m][n];
+		}
+		iTemp <<= 4;
+	}
+
+	//Permutation
+	for (int i = 0; i < 32; i++)
+	{
+		fResult[i] = bTemp[P[i] - 1];
+	}
+
 	return fResult;
 }
 
