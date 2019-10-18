@@ -55,6 +55,11 @@ bitset<32> f_Function(const bitset<32>& Ri_1, const bitset<48>& Ki)
 	{
 		fResult[i] = bTemp[P[i] - 1];
 	}
+
+#ifdef DEBUG
+	cout << "f-function:" << fResult << endl;
+#endif // DEBUG
+
 	return fResult;
 }
 
@@ -93,6 +98,11 @@ int main()
 			Li_1[k++] = bPlaintext[i];
 	}
 
+#ifdef DEBUG
+	cout << "IP:" << bPlaintext <<endl;
+	cout << "LR:" << Li_1 << Ri_1 << endl;
+#endif // DEBUG
+
 	//KEY PROCESS
 	bitset<64> bKEY(KEY);
 	bitset<56> PC_1_KEY;
@@ -108,6 +118,10 @@ int main()
 		else
 			Ci[j++] = PC_1_KEY[i];
 	}
+
+#ifdef DEBUG
+	cout << "PC-1" << PC_1_KEY << endl;
+#endif // DEBUG
 
 	//DES Feistel Network 
 	for (int N = 0; N < 16; N++)
@@ -135,6 +149,10 @@ int main()
 		{
 			PC_2_KEY[i] = PC_1_KEY[PC_2[i] - 1];
 		}
+
+#ifdef DEBUG
+		cout << "PC-2" << PC_2_KEY << endl;
+#endif // DEBUG
 
 		//f-function and swap
 		Li = Ri_1;
