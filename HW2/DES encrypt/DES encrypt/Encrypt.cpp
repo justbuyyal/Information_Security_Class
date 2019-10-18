@@ -21,8 +21,6 @@ void lRotate(std::bitset<N>& b, unsigned m)
 	b = b << m | b >> (N - m);
 }
 
-
-
 //f-function
 bitset<32> f_Function(const bitset<32>& Ri_1, const bitset<48>& Ki)
 {
@@ -67,7 +65,7 @@ int main()
 	stringstream ss1, ss2;	//我不知道為什麼只用一個ss會有bug所以用2個
 	string sPlaintext, sKEY;
 	unsigned long long  int KEY, plaintext;
-	bitset<64> bCiphertext;
+	bitset<64> ciphertext;
 
 	//INPUT
 	cin >> sKEY >> sPlaintext;
@@ -82,22 +80,18 @@ int main()
 	
 	//PROCESS
 	
-	//set bPlaintext & bTemp (original bPlaintext)
-	bitset<64> bPlaintext, bTemp(plaintext);
+	//set bPlaintext & temp (original bPlaintext)
+	bitset<64> bPlaintext, temp(plaintext);
 
 	//Bitwise initial permutation(IP) and split 2 parts
-	for (int i = 63, j = 31, k = 0; i >= 0; i--, k++)
+	for (int i = 0,j = 0, k = 0; i < 64; i++)
 	{
-		bPlaintext[i] = bTemp[IP[k] - 1];
+		bPlaintext[i] = temp[IP[i] - 1];
 		if (i < 32)
-			Ri_1[i] = bPlaintext[i];
+			Ri_1[j++] = bPlaintext[i];
 		else
-			Li_1[j--] = bPlaintext[i];
+			Li_1[k++] = bPlaintext[i];
 	}
-
-#ifdef DEBUG
-	cout << Li_1 << ' ' << Ri_1 << endl;
-#endif // DEBUG
 
 	//KEY PROCESS
 	bitset<64> bKEY(KEY);
@@ -106,19 +100,19 @@ int main()
 	bitset<48> PC_2_KEY;
 
 	//Key extend(PC_1) and split 2 parts
-	for (int i = 55, j = 27, k = 0; i >= 0; i--, k++)
+	for (int i = 0, j = 0; i < 56; i++)
 	{
-		PC_1_KEY[i] = bKEY[PC_1[k] - 1];
+		PC_1_KEY[i] = bKEY[PC_1[i] - 1];
 		if (i < 28)
 			Di[i] = PC_1_KEY[i];
 		else
-			Ci[j--] = PC_1_KEY[i];
+			Ci[j++] = PC_1_KEY[i];
 	}
 
-	//DES Feistel Network (16 round)
+	//DES Feistel Network 
 	for (int N = 0; N < 16; N++)
 	{
-		//get subkeys (rotate)
+		//get subkey (rotate)
 		if (N == 1 || N == 2 || N == 9 || N == 16)
 		{
 			lRotate(Ci, 1);
@@ -130,17 +124,16 @@ int main()
 			lRotate(Di, 2);
 		}
 
-		//put 2 subkeys into 1 key
 		unsigned long long temp;
 		temp = Ci.to_ullong();
 		temp <<= 28;
 		temp += Di.to_ullong();
 		PC_1_KEY = temp;
 
-		//key shrink(PC_2) to get runkey
-		for (int i = 47, k = 0; i >= 0; i--, k++)
+		//key shrink(PC_2)
+		for (int i = 0; i < 48; i++)
 		{
-			PC_2_KEY[i] = PC_1_KEY[PC_2[k] - 1];
+			PC_2_KEY[i] = PC_1_KEY[PC_2[i] - 1];
 		}
 
 		//f-function and swap
@@ -148,25 +141,23 @@ int main()
 		Ri = Li_1 ^ f_Function(Ri_1, PC_2_KEY);
 	}
 
-	// get right and left part together
+	// Final Permutation
 	for (int i = 0, j = 0, k = 0; k < 64; ++k)
 	{
 		if (k < 32)
-			bCiphertext[k] = Ri[i++];
+			ciphertext[k] = Ri[i++];
 		else
-			bCiphertext[k] = Li[j++];
+			ciphertext[k] = Li[j++];
 	}
-
-	// Final Permutation(FP/IP inverse)
-	bTemp = bCiphertext;
-	for (int i = 63, k = 0; i >= 0; i--, k++)
+	temp = ciphertext;
+	for (int i = 0; i < 64; i++)
 	{
-		bCiphertext[i] = bTemp[IPinverse[k] - 1];
+		ciphertext[i] = temp[IPinverse[i] - 1];
 	}
 
 	//OUTPUT
 	string Ciphertext = "";
-	unsigned long long output = bCiphertext.to_ullong();
+	unsigned long long output = ciphertext.to_ullong();
 #ifdef DEBUG
 	cout << output << endl;
 #endif // DEBUG
