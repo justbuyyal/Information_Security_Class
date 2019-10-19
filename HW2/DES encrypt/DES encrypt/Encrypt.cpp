@@ -5,8 +5,8 @@
 #include "table.h"
 using namespace std;
 
-#define DEBUG
-#define CIN
+//#define DEBUG
+//#define CIN
 
 //sorce https://bytes.com/topic/c/answers/473139-bitset-rotational-shift
 template <std::size_t N>
@@ -67,34 +67,41 @@ bitset<32> f_Function(const bitset<32>& Ri_1, const bitset<48>& Ki)
 	return fResult;
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	
-#ifdef CIN
 	stringstream ss1, ss2;	//我不知道為什麼只用一個ss會有bug所以用2個
 	string sPlaintext, sKEY;
 	unsigned long long  int KEY, plaintext;
 	bitset<64> ciphertext;
 
 	//INPUT
+
+#ifdef CIN
 	cin >> sKEY >> sPlaintext;
+#endif // CIN
+
+#ifndef CIN
+	sKEY = argv[1];
+	sPlaintext = argv[2];
+#endif // !CIN
+
 	ss1 << hex << sKEY.erase(0, 2);
 	ss1 >> KEY;
 	ss2 << hex << sPlaintext.erase(0, 2);
 	ss2 >> plaintext;
-#endif // CIN
-	
+
 #ifdef DEBUG
 	cout << "Plaintext: " << sPlaintext << " key : " << sKEY << endl;
 #endif // DEBUG
 
 	bitset<32> Li_1, Ri_1, Li, Ri;
 	
-	
 	//PROCESS
 	
 	//set bPlaintext & temp (original bPlaintext)
 	bitset<64> bPlaintext, temp(plaintext);
+
 #ifdef DEBUG
 	cout << "Temp:" << temp << endl;
 #endif // DEBUG
@@ -103,7 +110,7 @@ int main()
 	//Bitwise initial permutation(IP) and split 2 parts
 	for (int i = 0,j = 0, k = 0; i < 64; i++)
 	{
-		bPlaintext[i] = temp[IP[i] - 1];
+		bPlaintext[i] = temp[64 - IP[63 - i]];
 		if (i < 32)
 			Ri_1[j++] = bPlaintext[i];
 		else
@@ -143,7 +150,12 @@ int main()
 	//DES Feistel Network 
 	for (int N = 0; N < 16; N++)
 	{
+
+#ifdef DEBUG
 		cout << "Time: " << N + 1 << endl;
+
+#endif // DEBUG
+
 		//get subkey (rotate)
 		if (N == 0 || N == 1 || N == 8 || N == 15)
 		{
