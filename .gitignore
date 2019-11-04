@@ -7,6 +7,10 @@
 *.pdf
 *.doc
 *.docx
+*.PNG
+
+# Chapter
+Chapter/
 
 # User-specific files
 *.rsuser
