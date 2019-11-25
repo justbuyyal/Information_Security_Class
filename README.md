@@ -22,5 +22,5 @@
 #### python ./AES.py {mode} {Key} {image path}
 ##### mode have `ECB`, `CBC`, `extend`
 ##### key length must be 16, 24 or 32
-#### Encryption result will be store at `./cipher.jpg`
+#### Encryption result will be store at `./encrypt.jpg`
 #### Decryption result will be store at `./decrypt.jpg`

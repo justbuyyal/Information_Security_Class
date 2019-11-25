@@ -44,7 +44,7 @@ def ECB():
     cipher.close()
     # output cipher image
     cipherPPM = Image.open('./cipher.ppm')
-    cipherPPM.save('./cipher.jpg', 'jpeg')
+    cipherPPM.save('./encrypt.jpg', 'jpeg')
     cipherPPM.close()
 
 
@@ -104,7 +104,7 @@ def CBC():
     plaintextPPM.close()
     cipher.close()
     cipherPPM = Image.open('./cipher.ppm')
-    cipherPPM.save('./cipher.jpg', 'jpeg')
+    cipherPPM.save('./encrypt.jpg', 'jpeg')
     cipherPPM.close()
 
     ##decrypt
