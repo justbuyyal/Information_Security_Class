@@ -17,3 +17,8 @@
 #### ./DES_Decrypt.exe {Key} {Ciphertext}
 
 #### **Remember：Key needs to be capital & Plaintext needs to be lower case & Ciphertext needs to be captial！！**
+
+### HW3
+#### python ./AES.py {mode} {Key} {image path}
+##### mode have 'ECB', 'CBC', 'extend'
+##### key length must be 16, 24 or 32
