@@ -10,35 +10,33 @@ def Square_and_Multiply(x, e, n):
             y = (y * x) % n
     return y
 
-def hcfnaive(a,b): 
+def gcd(a,b): 
     if(b==0): 
         return a 
     else: 
-        return hcfnaive(b,a%b)
+        return gcd(b, a%b)
 
 def keyGeneration(p, q):
     n = p * q
     phi_N = (p - 1) * (q - 1)
+    # print('phi_N', phi_N)
     e = 3
-    d = 7
-    # e in {1, 2, ... phi_N - 1}, gcd(e, phi_N) = 1
-    # d * e = 1 mod phi_N
+    d = 1
+    ## e in {1, 2, ... phi_N - 1}, gcd(e, phi_N) = 1
+    while (gcd(e, phi_N) != 1 and e < phi_N):
+        e += 2
+    # print('e', e)
+
+    ## d * e = 1 mod phi_N
+    k = 1
+    i = 3
+    while((k * phi_N + 1) % e != 0):
+        k += 1
+        
+    d = (k * phi_N + 1) // e
+    
+    # print('d * e mod phi_n=', (d * e) % phi_N)
     return e, d, n
-
-
-p = 3
-q = 11
-a = keyGeneration(p,q)
-# a[0] => e
-# a[1] => d
-# a[3] => n
-
-x = 4
-encrypt = Square_and_Multiply(x, a[0], a[2])
-decrypt = Square_and_Multiply(encrypt, a[1], a[2])
-print(encrypt)
-print(decrypt)
-
 
 def Miller_Rabin(p):
     N = p - 1
@@ -62,4 +60,34 @@ def Miller_Rabin(p):
             return False
     return True
 
-print(Miller_Rabin(3388495837466721394368393204672181522815830368604993048084925840555281177))
+# p = 33478071698956898786044169848212690817704794983713768568912431388982883793878002287614711652531743087737814467999489
+# q = 36746043666799590428244633799627952632279158164343087642676032283815739666511279233373417143396810270092798736308917
+
+# p = 22111
+# q = 54787
+
+# p = 199
+# q = 197
+
+while (True):
+    num = random.randrange(2 ** 1024 + 1, 2 ** 1025, 2)
+    if (Miller_Rabin(num)):
+        break
+p = num
+while (True):
+    num = random.randrange(2 ** 1024 + 1, 2 ** 1025, 2)
+    if (Miller_Rabin(num)):
+        break
+q = num
+
+print('p=', p, '\nq=', q)
+# key[0] => e
+# key[1] => d
+# key[2] => n
+key = keyGeneration(p,q)
+
+x = 4
+encrypt = Square_and_Multiply(x, key[0], key[2])
+decrypt = Square_and_Multiply(encrypt, key[1], key[2])
+print('\nciphertext', encrypt)
+print('plaintext', decrypt)
