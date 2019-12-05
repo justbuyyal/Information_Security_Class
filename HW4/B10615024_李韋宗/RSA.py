@@ -70,44 +70,76 @@ def Miller_Rabin(p):
 # p = 199
 # q = 197
 
-if(len(argv) != 3 and len(argv) != 5):
+if (len(argv) < 3):
     print('Wrong number of parameters')
-else:
-    # Initial key
-    if (argv[1] == 'init'):
-        bit = argv[2]
-        bit = int(bit)
-        while (True):
-            num = random.randrange(2 ** bit + 1, 2 ** (bit + 1), 2)
-            if (Miller_Rabin(num)):
-                break
-        p = num
-        while (True):
-            num = random.randrange(2 ** bit + 1, 2 ** (bit + 1), 2)
-            if (Miller_Rabin(num)):
-                break
-        q = num
-        # key[0] => e
-        # key[1] => d
-        # key[2] => n
-        key = keyGeneration(p, q)
-        print('key\np:', p, '\nq:', q ,'\nn:', key[2], '\ne', key[0], '\nd:', key[1])
-    
-    # Encrypt
-    elif (argv[1] == '-e'):
-        plaintext = argv[2]
-        n = agrv[3]
-        e = argv[4]
-        encrypt = Square_and_Multiply(plaintext, e, n)
-        print('Encryption ciphertext:', encrypt)
-    
-    # Decrypt
-    elif (argv[1] == '-d'):
-        ciphertext = argv[2]
-        n = agrv[3]
-        d = argv[4]
-        decrypt = Square_and_Multiply(ciphertext, d, n)
-        print('Decryption plaintext:', decrypt)
+    a = '123456'
+    a = a[3:]
+    print(a[0:3])
+    exit(0)
 
-    else:
-        print('Parameters error')
+# Initial key
+# init {bit}
+if (argv[1] == 'init'):
+    bit = argv[2]
+    bit = int(bit)
+    while (True):
+        num = random.randrange(2 ** bit + 1, 2 ** (bit + 1), 2)
+        if (Miller_Rabin(num)):
+            break
+    p = num
+    while (True):
+        num = random.randrange(2 ** bit + 1, 2 ** (bit + 1), 2)
+        if (Miller_Rabin(num)):
+            break
+    q = num
+    # key[0] => e
+    # key[1] => d
+    # key[2] => n
+    key = keyGeneration(p, q)
+    print('key\np:', p, '\nq:', q ,'\nn:', key[2], '\ne', key[0], '\nd:', key[1])
+    print('')
+
+# Encrypt
+# -e {n} {e} {plaintext}
+elif (argv[1] == '-e'):
+    plaintext = argv[4]
+    n = int(argv[2])
+    e = int(argv[3])
+    maxDigit = len(argv[2]) - 1
+    temp = ''
+    for c in plaintext:
+        temp += str(ord(c))
+    print('temp:', temp)
+    print('Encryption ciphertext:')
+    for i in range(0, len(temp), maxDigit):
+        plaintext = int(temp[i : i + maxDigit])
+        encrypt = Square_and_Multiply(plaintext, e, n)
+        print(encrypt)
+    print('')
+
+# Decrypt
+# -e {n} {d} {ciphertext...}
+elif (argv[1] == '-d'):
+    n = int(argv[2])
+    d = int(argv[3])
+    decrypt = ''
+    decryptText = ''
+    print('Decryption plaintext:')
+    for i in range(4, len(argv)):
+        ciphertext = int(argv[i])
+        decrypt += str(Square_and_Multiply(ciphertext, d, n))
+        print(decrypt)
+    i = 0
+    
+    while(len(decrypt) != 0):
+        if (decrypt[i] == '1'):
+            decryptText += chr(int(decrypt[i : i + 3]))
+            decrypt = decrypt[i + 3 : ]
+        else:
+            decryptText += chr(int(decrypt[i : i + 2]))
+            decrypt = decrypt[i + 2 : ]
+
+    print(decryptText, '')
+
+else:
+    print('Parameters error')
