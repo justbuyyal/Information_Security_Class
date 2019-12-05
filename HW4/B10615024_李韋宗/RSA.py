@@ -61,20 +61,9 @@ def Miller_Rabin(p):
             return False
     return True
 
-# p = 33478071698956898786044169848212690817704794983713768568912431388982883793878002287614711652531743087737814467999489
-# q = 36746043666799590428244633799627952632279158164343087642676032283815739666511279233373417143396810270092798736308917
-
-# p = 22111
-# q = 54787
-
-# p = 199
-# q = 197
 
 if (len(argv) < 3):
     print('Wrong number of parameters')
-    a = '123456'
-    a = a[:0] + '0' + a[0:]
-    print(a)
     exit(0)
 
 # Initial key
@@ -95,8 +84,6 @@ if (argv[1] == 'init'):
     # key[0] => e
     # key[1] => d
     # key[2] => n
-    p = 409
-    q = 293
     key = keyGeneration(p, q)
     print('key\np:', p, '\nq:', q ,'\nn:', key[2], '\ne:', key[0], '\nd:', key[1])
     print('')
@@ -111,7 +98,7 @@ elif (argv[1] == '-e'):
     temp = ''
     for c in plaintext:
         temp += str(ord(c))
-    print('temp:', temp)
+    # print('temp:', temp)
     print('Encryption ciphertext:')
     for i in range(0, len(temp), maxDigit):
         plaintext = int(temp[i : i + maxDigit])
@@ -130,19 +117,19 @@ elif (argv[1] == '-d'):
     for i in range(4, len(argv)):
         ciphertext = int(argv[i])
         decrypt += str(Square_and_Multiply(ciphertext, d, n))
-    print('decrypt', decrypt)
+    # print('decrypt', decrypt)
     
     while(len(decrypt) != 0):
         if (decrypt[0] == '1'):
-            if (int(decrypt[0 : 3]) > 122):
+            if (int(decrypt[0 : 3]) > 126):
                 decrypt = decrypt[ : 1] + '0' + decrypt[1 : ]
-                print('insert 0')
+                # print('insert 0')
             decryptText += chr(int(decrypt[0 : 3]))
             decrypt = decrypt[3 : ]
         else:
             decryptText += chr(int(decrypt[0 : 2]))
             decrypt = decrypt[2 : ]
-        print(decrypt)
+        # print(decrypt)
     print(decryptText, '')
 
 else:
