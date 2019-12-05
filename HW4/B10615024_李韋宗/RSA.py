@@ -1,4 +1,5 @@
 import random
+from sys import argv
 
 # Exponent e, base element x, Modulus n
 def Square_and_Multiply(x, e, n):   
@@ -69,25 +70,44 @@ def Miller_Rabin(p):
 # p = 199
 # q = 197
 
-while (True):
-    num = random.randrange(2 ** 1024 + 1, 2 ** 1025, 2)
-    if (Miller_Rabin(num)):
-        break
-p = num
-while (True):
-    num = random.randrange(2 ** 1024 + 1, 2 ** 1025, 2)
-    if (Miller_Rabin(num)):
-        break
-q = num
+if(len(argv) != 3 and len(argv) != 5):
+    print('Wrong number of parameters')
+else:
+    # Initial key
+    if (argv[1] == 'init'):
+        bit = argv[2]
+        bit = int(bit)
+        while (True):
+            num = random.randrange(2 ** bit + 1, 2 ** (bit + 1), 2)
+            if (Miller_Rabin(num)):
+                break
+        p = num
+        while (True):
+            num = random.randrange(2 ** bit + 1, 2 ** (bit + 1), 2)
+            if (Miller_Rabin(num)):
+                break
+        q = num
+        # key[0] => e
+        # key[1] => d
+        # key[2] => n
+        key = keyGeneration(p, q)
+        print('key\np:', p, '\nq:', q ,'\nn:', key[2], '\ne', key[0], '\nd:', key[1])
+    
+    # Encrypt
+    elif (argv[1] == '-e'):
+        plaintext = argv[2]
+        n = agrv[3]
+        e = argv[4]
+        encrypt = Square_and_Multiply(plaintext, e, n)
+        print('Encryption ciphertext:', encrypt)
+    
+    # Decrypt
+    elif (argv[1] == '-d'):
+        ciphertext = argv[2]
+        n = agrv[3]
+        d = argv[4]
+        decrypt = Square_and_Multiply(ciphertext, d, n)
+        print('Decryption plaintext:', decrypt)
 
-print('p=', p, '\nq=', q)
-# key[0] => e
-# key[1] => d
-# key[2] => n
-key = keyGeneration(p,q)
-
-x = 4
-encrypt = Square_and_Multiply(x, key[0], key[2])
-decrypt = Square_and_Multiply(encrypt, key[1], key[2])
-print('\nciphertext', encrypt)
-print('plaintext', decrypt)
+    else:
+        print('Parameters error')
