@@ -67,19 +67,20 @@ def Miller_Rabin(p):
 def Chinese_Remiander_Theorem(d, n, p, q):
     d_p = d % (p - 1)
     d_q = d % (q - 1)
-    k = 1
     inv_q = Square_and_Multiply(q, p - 2, p)
     return d_p, d_q, inv_q
 
 if (len(argv) < 3):
     print('Wrong number of parameters')
-    print('t',int(argv[1], 0))
     exit(0)
 
 # Initial key
 # init {bit}
 if (argv[1] == 'init'):
-    bit = argv[2]
+    if (argv[2] == 'ex'):
+        bit = argv[3]
+    else:    
+        bit =  argv[2]
     bit = int(bit)
     while (True):
         num = random.randrange(2 ** bit + 1, 2 ** (bit + 1), 2)
@@ -96,6 +97,11 @@ if (argv[1] == 'init'):
     # key[2] => n
     e, d, n = keyGeneration(p, q)
     print('key\np:', p, '\nq:', q ,'\nn:', n, '\ne:', e, '\nd:', d)
+
+    if (argv[2] == 'ex'):
+        # get key[0]=> d_p, key[1]=> d_q, key[2]=> inv_q
+        d_p, d_q, inv_q = Chinese_Remiander_Theorem(d, n, p, q)
+        print('d_p:', d_p, '\nd_q:', d_q, '\ninv_q:', inv_q)
     print('')
 
 # Encrypt
@@ -117,7 +123,7 @@ elif (argv[1] == '-e'):
     print('')
 
 # Decrypt
-# -d {n} {d} {ciphertext...}
+# -d {n} {d} {[ciphertext]...}
 elif (argv[1] == '-d'):
     decrypt = ''
     decryptText = ''
@@ -125,16 +131,17 @@ elif (argv[1] == '-d'):
 
 
     # extra mode (Chinese_Remiander_Theorem)
-    # -d ex {n} {d} {p} {q} {ciphertext...}
+    # -d ex {n} {d} {p} {q} {d_p} {d_q} {inv_q} {[ciphertext]...}
     if (argv[2] == 'ex'):
         n = int(argv[3], 0)
         d = int(argv[4], 0)
         p = int(argv[5], 0)
         q = int(argv[6], 0)
-        # get key[0]=> d_p, key[1]=> d_q, key[2]=> inv_q
-        d_p, d_q, inv_q = Chinese_Remiander_Theorem(d, n, p, q)
+        d_p = int(argv[7], 0)
+        d_q = int(argv[8], 0)
+        inv_q = int(argv[9], 0)
         
-        for i in range(7, len(argv)):
+        for i in range(10, len(argv)):
             ciphertext = int(argv[i])
             m_1 = Square_and_Multiply(ciphertext, d_p, p)
             m_2 = Square_and_Multiply(ciphertext, d_q, q)
@@ -158,7 +165,7 @@ elif (argv[1] == '-d'):
             decryptText += chr(int(decrypt[0 : 2]))
             decrypt = decrypt[2 : ]
         # print(decrypt)
-    print(decryptText, '')
+    print(decryptText, '\n')
 
 else:
     print('Parameters error')
