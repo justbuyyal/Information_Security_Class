@@ -98,9 +98,8 @@ def LargePrime(bits):
         LP = random.randrange(2**(bits -1), 2**(bits))
     return(LP)
 
+# For command: init
 def GeneratorRSA(bits):
-    # p = Crypto.Util.number.getPrime(bits, randfunc=Crypto.Random.get_random_bytes)
-    # q = Crypto.Util.number.getPrime(bits, randfunc=Crypto.Random.get_random_bytes)
     p = LargePrime(bits)
     q = LargePrime(bits)
     while p == q:
@@ -112,15 +111,12 @@ def GeneratorRSA(bits):
     while gcd(e, phi_n) != 1:
         e = random.randrange(1, phi_n - 1)
     # ed mod (phi_n) = 1
-    # hint : http://math453spring2009.wikidot.com/lecture-8
-    # hint : https://gist.github.com/JonCooperWorks/5314103
     d = multiplicative_inverse(phi_n, e)
     print('p = ', p)
     print('q = ', q)
     print('n = ', n)
     print('e = ', e)
     print('d = ', d)
-    # print((e*d)%phi_n)
 
 # -------------------------------------------------------- #
 
@@ -138,7 +134,7 @@ if(mode == '-e'):
         plainnum += pow(256, count) * ord(i)
         count+=1
     cipher = Square_and_Multiply(plainnum, e, n)
-    print(cipher)
+    print('Cipher Text: ', cipher)
 elif(mode == '-d'):
     ciphertext = int(argv[2])
     n = int(argv[3])
@@ -151,13 +147,12 @@ elif(mode == '-d'):
         ciphernum = ciphernum // 256
     plain += chr(int(ciphernum))
     plain = plain[::-1] # reverse string
-    print(plain)
+    print('Plaintext: ', plain)
     
 elif(mode == 'init'):
     if(argv[2] == '1024'):
-        # python hint: https://asecuritysite.com/encryption/getprimen
-        # random number hint: https://langui.sh/2009/03/07/generating-very-large-primes/
         GeneratorRSA(1024)
+    else: print('Wrong bits number')
 else:
     print('Wrong mode')
     exit(0)
