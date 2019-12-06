@@ -11,7 +11,7 @@ def Square_and_Multiply(x, e, n):
             y = (y * x) % n
     return y
 
-def gcd(a,b): 
+def gcd(a, b): 
     if(b==0): 
         return a 
     else: 
@@ -35,6 +35,8 @@ def keyGeneration(p, q):
         k += 1
         
     d = (k * phi_N + 1) // e
+
+
     
     # print('d * e mod phi_n=', (d * e) % phi_N)
     return e, d, n
@@ -61,9 +63,17 @@ def Miller_Rabin(p):
             return False
     return True
 
+# source: http://jianiau.blogspot.com/2014/05/rsa-decrypt-with-crt.html
+def Chinese_Remiander_Theorem(d, n, p, q):
+    d_p = d % (p - 1)
+    d_q = d % (q - 1)
+    k = 1
+    inv_q = Square_and_Multiply(q, p - 2, p)
+    return d_p, d_q, inv_q
 
 if (len(argv) < 3):
     print('Wrong number of parameters')
+    print('t',int(argv[1], 0))
     exit(0)
 
 # Initial key
@@ -84,16 +94,16 @@ if (argv[1] == 'init'):
     # key[0] => e
     # key[1] => d
     # key[2] => n
-    key = keyGeneration(p, q)
-    print('key\np:', p, '\nq:', q ,'\nn:', key[2], '\ne:', key[0], '\nd:', key[1])
+    e, d, n = keyGeneration(p, q)
+    print('key\np:', p, '\nq:', q ,'\nn:', n, '\ne:', e, '\nd:', d)
     print('')
 
 # Encrypt
 # -e {n} {e} {plaintext}
 elif (argv[1] == '-e'):
     plaintext = argv[4]
-    n = int(argv[2])
-    e = int(argv[3])
+    n = int(argv[2], 0)
+    e = int(argv[3], 0)
     maxDigit = len(argv[2]) - 1
     temp = ''
     for c in plaintext:
@@ -107,18 +117,36 @@ elif (argv[1] == '-e'):
     print('')
 
 # Decrypt
-# -e {n} {d} {ciphertext...}
+# -d {n} {d} {ciphertext...}
 elif (argv[1] == '-d'):
-    n = int(argv[2])
-    d = int(argv[3])
     decrypt = ''
     decryptText = ''
     print('Decryption plaintext:')
-    for i in range(4, len(argv)):
-        ciphertext = int(argv[i])
-        decrypt += str(Square_and_Multiply(ciphertext, d, n))
-    # print('decrypt', decrypt)
-    
+
+
+    # extra mode (Chinese_Remiander_Theorem)
+    # -d ex {n} {d} {p} {q} {ciphertext...}
+    if (argv[2] == 'ex'):
+        n = int(argv[3], 0)
+        d = int(argv[4], 0)
+        p = int(argv[5], 0)
+        q = int(argv[6], 0)
+        # get key[0]=> d_p, key[1]=> d_q, key[2]=> inv_q
+        d_p, d_q, inv_q = Chinese_Remiander_Theorem(d, n, p, q)
+        
+        for i in range(7, len(argv)):
+            ciphertext = int(argv[i])
+            m_1 = Square_and_Multiply(ciphertext, d_p, p)
+            m_2 = Square_and_Multiply(ciphertext, d_q, q)
+            h = inv_q * (m_1 - m_2) % p
+            decrypt += str(m_2 + h * q)
+    else:
+        n = int(argv[2], 0)
+        d = int(argv[3], 0)
+        for i in range(4, len(argv)):
+            ciphertext = int(argv[i], 0)
+            decrypt += str(Square_and_Multiply(ciphertext, d, n))
+
     while(len(decrypt) != 0):
         if (decrypt[0] == '1'):
             if (int(decrypt[0 : 3]) > 126):
