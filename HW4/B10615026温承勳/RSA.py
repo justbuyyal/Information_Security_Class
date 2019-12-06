@@ -31,44 +31,54 @@ prime_list = [
     3259,3271,3299,3301,3307,3313,3319,3323,3329,3331,3343,3347,3359,3361,3371,3373,3389,3391,3407,3413,
     3433,3449,3457,3461,3463,3467,3469,3491,3499,3511,3517,3527,3529,3533,3539,3541,3547,3557,3559,3571
     ]
-#plaintext = ascii 0x21(!) ~ 0x7A(z)
-
 # function
 # -------------------------------------------------------- #
+# Multiplicative inverse
+def multiplicative_inverse(phi, e):
+    x, x1 = 0, 1
+    y, y1 = 1, 0
+    temp_phi = phi
+    while (e != 0):
+        q = phi // e
+        phi, e = e, phi % e
+        x, x1 = x1 - q * x, x
+        y, y1 = y1 - q * y, y
+    if y1 < 0: return temp_phi+y1
+    else: return y1
+
+# Extended GCD
+def gcd(a, b):
+    while b != 0:
+        a,b = b, a%b
+    return a
+
 # Square_and_Multiply
-def Square_and_Multiply(base, exp, mod):
+def Square_and_Multiply(base, exp, N):
     result = base
     bits = bin(int(exp))
     for i in range(3, len(bits)):
-        result = (result * result) % mod
-        if(bits[i] == '1'):
-            result = (result * base) % mod
+        result = pow(result, 2, N)
+        if(bits[i:i+1] == '1'):
+            result = (result * base) % N
     return result
 
 # Miller Rabin test
 def Miller_rabin(TN):
-    print('Miller Rabin test')
     k = 0
     m = TN - 1
-    while(m%2 == 0):
-        m /= 2
-        k += 1
-    for t in range(4):
-        a = random.randrange(2, TN - 2)
-        print('a = ',a)
-        b = Square_and_Multiply(a, m, TN)
-        mr = True
-        if (b!=1):
+    while (m and 1) == 0:
+        k+=1
+        m>>1
+    for t in range(3):
+        apha = random.randrange(2, TN - 2)
+        b = Square_and_Multiply(apha, m, TN)
+        if b != 1 and b != TN-1:
             i = 1
-            while i<k:
-                b = Square_and_Multiply(b, 2, TN)
+            while i<k and b != TN-1:
+                b = Square_and_Multiply(b,2, TN)
                 if b == 1: return False
-                if b == (TN - 1): mr = False
-                i += 1
-        if b == (TN - 1): mr = False
-        if(mr): 
-            print('mr')
-            return False
+                i+=1
+            if b != TN-1: return False
     return True
 
 # Determine whether is a Prime
@@ -88,28 +98,61 @@ def LargePrime(bits):
         LP = random.randrange(2**(bits -1), 2**(bits))
     return(LP)
 
+# For command: init
 def GeneratorRSA(bits):
-    print('RSA')
-    # p = Crypto.Util.number.getPrime(bits, randfunc=Crypto.Random.get_random_bytes)
-    # q = Crypto.Util.number.getPrime(bits, randfunc=Crypto.Random.get_random_bytes)
-    p = 1091316167030363
-    if(isPrime(p)): print('Good')
-    else: print('Bad')
+    p = LargePrime(bits)
+    q = LargePrime(bits)
+    while p == q:
+        p = LargePrime(bits)
+    n = p*q
+    phi_n = (p-1)*(q-1)
+    # 1 <= e <= phi_n - 1 , gcd(e, phi_n) = 1
+    e = random.randrange(2, phi_n - 1)
+    while gcd(e, phi_n) != 1:
+        e = random.randrange(1, phi_n - 1)
+    # ed mod (phi_n) = 1
+    d = multiplicative_inverse(phi_n, e)
+    print('p = ', p)
+    print('q = ', q)
+    print('n = ', n)
+    print('e = ', e)
+    print('d = ', d)
+
 # -------------------------------------------------------- #
 
 # Mode exception handler
 mode = argv[1]
-if(mode == '-s'):
-    print('small number')
-elif(mode == '-l'):
-    print('Large prime')
-
+if(mode == '-e'):
+    plaintext = argv[2]
+    n = int(argv[3])
+    e = int(argv[4])
+    print('Start Encrypt')
+    plainnum = 0
+    count = 0
+    Ctext = ''
+    for i in reversed(plaintext):
+        plainnum += pow(256, count) * ord(i)
+        count+=1
+    cipher = Square_and_Multiply(plainnum, e, n)
+    print('Cipher Text: ', cipher)
+elif(mode == '-d'):
+    ciphertext = int(argv[2])
+    n = int(argv[3])
+    d = int(argv[4])
+    print('Start Decrypt')
+    plain = ''
+    ciphernum = Square_and_Multiply(ciphertext, d, n)
+    while ciphernum//256 > 0:
+        plain += chr(int(ciphernum%256))
+        ciphernum = ciphernum // 256
+    plain += chr(int(ciphernum))
+    plain = plain[::-1] # reverse string
+    print('Plaintext: ', plain)
+    
 elif(mode == 'init'):
-    print('initialization')
     if(argv[2] == '1024'):
-        # python hint: https://asecuritysite.com/encryption/getprimen
-        # random number hint: https://langui.sh/2009/03/07/generating-very-large-primes/
         GeneratorRSA(1024)
+    else: print('Wrong bits number')
 else:
     print('Wrong mode')
     exit(0)
