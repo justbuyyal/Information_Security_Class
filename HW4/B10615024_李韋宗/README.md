@@ -10,9 +10,13 @@
 ## Command need to be follow below
 
 ### Initial a k-bit key
-* Will random two k-bit prime `p` and `q`, and return `p`, `q`, `n`, `e`, `d`
+* Will random two k-bit prime `p` and `q`, and return `p`, `q`, `n`, `e` and `d`
     
     `./RSA.py init {k-bit}`
+* Extra mode: will have extra return `d_p`, `d_q` and `inv_q`
+    
+    `./RSA.py init ex {k-bit}`
+
 
 ### Encryption
 * Encrypt a string into one or more integer, depending on how large `n` is.
@@ -25,9 +29,12 @@
 * Decrypt one or more integer into string, depending on how large `n` is.
     
     `./RSA.py -d {n} {d} {[ciphertext]...}`
+
+* Extra mode: need extra paramete `p`, `q`, `d_p`, `d_q` and `inv_q`
+
+    `./RSA.py -d ex {n} {d} {p} {q} {d_p} {d_q} {inv_q} {[ciphertext]...}`
+
 * **NTOE: ciphertext will be one or more integer**
-
-
 
 
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
