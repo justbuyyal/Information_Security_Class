@@ -76,8 +76,7 @@ def get_prime(bitsize):
         LP = random.randrange(2**(bitsize-1), 2**(bitsize))
     return(LP)
 
-def dsa_sign():
-    # p=1024, q=160, beta 
+def generate_pq():
     q = get_prime(160)
     k = pow(2, 863)
     temp1 = pow(2, 1023)
@@ -89,14 +88,28 @@ def dsa_sign():
     p = q*k+1
     return(p,q)
 
-mode = argv[1]
-if(mode == '-sign'):
-    sign_list = []
-    sign_list = dsa_sign()
-    for i in sign_list:
-        print(i, '\n')
-elif(mode == '-verify'):
-    print('asd')
-else:
-    print('input wrong mode !!')
-    exit(0)
+def dsa_sign():
+    # p=1024, q=160, h = 2(commonly), apha => ord(apha)=q, 0 < d(random) < q, beta => pow(apha, d, p)
+    h = 2
+    p,q = generate_pq()
+    # generate apha
+    while(pow(h, p-1, p) != 1):
+        p,q = generate_pq()
+    apha = pow(2, (p-1)//q, p)
+    d = random.randrange(1, q)
+    beta = pow(apha, d, p)
+    return(p,q, apha, beta, d)
+
+if __name__ == "__main__":
+    mode = argv[1]
+    if(mode == '-sign'):
+        sign_list = []
+        word_list = ['p: ', 'q: ', 'apha: ', 'beta: ', 'd: ']
+        sign_list = dsa_sign()
+        for i in range(word_list):
+            print(word_list[i]+sign_list[i], '\n')
+    elif(mode == '-verify'):
+        print('asd')
+    else:
+        print('input wrong mode !!')
+        exit(0)
