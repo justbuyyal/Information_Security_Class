@@ -1,4 +1,4 @@
-from hashlib import sha1
+import hashlib
 from sys import argv
 import random
 
@@ -29,6 +29,19 @@ prime_list = [
     3259,3271,3299,3301,3307,3313,3319,3323,3329,3331,3343,3347,3359,3361,3371,3373,3389,3391,3407,3413,
     3433,3449,3457,3461,3463,3467,3469,3491,3499,3511,3517,3527,3529,3533,3539,3541,3547,3557,3559,3571
 ]
+
+# Multiplicative inverse
+def multiplicative_inverse(phi, e):
+    x, x1 = 0, 1
+    y, y1 = 1, 0
+    temp_phi = phi
+    while (e != 0):
+        q = phi // e
+        phi, e = e, phi % e
+        x, x1 = x1 - q * x, x
+        y, y1 = y1 - q * y, y
+    if y1 < 0: return temp_phi+y1
+    else: return y1
 
 # Square_and_Multiply
 def Square_and_Multiply(base, exp, N):
@@ -88,7 +101,7 @@ def generate_pq():
     p = q*k+1
     return(p,q)
 
-def dsa_sign():
+def dsa_sign(message):
     # p=1024, q=160, h = 2(commonly), apha => ord(apha)=q, 0 < d(random) < q, beta => pow(apha, d, p)
     h = 2
     p,q = generate_pq()
@@ -96,20 +109,34 @@ def dsa_sign():
     while(pow(h, p-1, p) != 1):
         p,q = generate_pq()
     apha = pow(2, (p-1)//q, p)
-    d = random.randrange(1, q)
+    # generate d and beta
+    d = random.randrange(1, q-1)
     beta = pow(apha, d, p)
-    return(p,q, apha, beta, d)
+    # generate r, s
+    Ke = random.randrange(1, q-1)
+    r = pow(apha, Ke, p) % q
+    H = hashlib.sha1()
+    H.update(message.encode("utf-8"))
+    hash_sha1 = int(H.hexdigest(), 16) # hashed result
+    # print(hash_sha1)
+    Ke_inverse = multiplicative_inverse(q, Ke)
+    s = ((hash_sha1 + d * r) * Ke_inverse) % q
+    return(p,q, apha, beta, r, s)
 
 if __name__ == "__main__":
     mode = argv[1]
     if(mode == '-sign'):
+        print('Sign =====================>')
+        Message = argv[2]
         sign_list = []
-        word_list = ['p: ', 'q: ', 'apha: ', 'beta: ', 'd: ']
-        sign_list = dsa_sign()
-        for i in range(word_list):
-            print(word_list[i]+sign_list[i], '\n')
+        word_list = ['p: ', 'q: ', 'apha: ', 'beta: ', 'r: ', 's: ']
+        sign_list = dsa_sign(Message)
+        for i in range(len(word_list)):
+            print(word_list[i], sign_list[i])
+            print('\n')
     elif(mode == '-verify'):
-        print('asd')
+        # to do
+        print('To do')
     else:
         print('input wrong mode !!')
         exit(0)
