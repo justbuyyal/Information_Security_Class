@@ -31,6 +31,7 @@ prime_list = [
 ]
 
 # Multiplicative inverse
+# find multiplicative inverse of e under mod phi
 def multiplicative_inverse(phi, e):
     x, x1 = 0, 1
     y, y1 = 1, 0
@@ -118,10 +119,31 @@ def dsa_sign(message):
     H = hashlib.sha1()
     H.update(message.encode("utf-8"))
     hash_sha1 = int(H.hexdigest(), 16) # hashed result
-    # print(hash_sha1)
+    # print("hash", hash_sha1)
     Ke_inverse = multiplicative_inverse(q, Ke)
     s = ((hash_sha1 + d * r) * Ke_inverse) % q
     return(p,q, apha, beta, r, s)
+
+def dsa_verify(verifyKey_list, message):
+    p, q, alpha, beta, r, s = verifyKey_list
+    # print(p, q, alpha, beta, r, s)
+
+    w = multiplicative_inverse(q, s)
+    H = hashlib.sha1()
+    H.update(message.encode("utf-8"))
+    hashVal = int(H.hexdigest(), 16)
+    # print("hash", hashVal)
+
+    u_1 = (w * hashVal) % q
+    u_2 = (w * r) % q
+    v = ((Square_and_Multiply(alpha, u_1, p) * Square_and_Multiply(beta, u_2, p)) % p ) % q
+
+    # print("r=", r)
+    # print("v=", v)
+    if (v == r):
+        return True
+    else:
+        return False
 
 if __name__ == "__main__":
     mode = argv[1]
@@ -135,8 +157,15 @@ if __name__ == "__main__":
             print(word_list[i], sign_list[i])
             print('\n')
     elif(mode == '-verify'):
-        # to do
-        print('To do')
+        print('Verify =====================>')
+        verifyKey_list = [None] * 6    # p, q, alpha, beta, r, s
+        j = 0
+        for i in range(2, 8):
+            verifyKey_list[j] = int(argv[i])
+            j += 1
+        Message = argv[8]
+        print(dsa_verify(verifyKey_list, Message))
+
     else:
         print('input wrong mode !!')
         exit(0)
