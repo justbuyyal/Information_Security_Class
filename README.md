@@ -24,3 +24,13 @@
 ##### key length must be 16, 24 or 32
 #### Encryption result will be store at `./encrypt.jpg`
 #### Decryption result will be store at `./decrypt.jpg`
+
+### HW4
+This HW are personal homework. The readme files are in each folder.
+
+### HW5
+#### python ./AES.py -sign {message}
+##### Sign mode will return `p`, `q`, `alpha`, `beta`, `r`, `s`
+#### python ./AES.py -verify {Key_list} {message}
+##### Key_list need in the order below: `p`, `q`, `alpha`, `beta`, `r`, `s`
+##### Verfity mode will return `True`/`False`
